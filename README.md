@@ -11,13 +11,13 @@ consuming the OpenWeatherMap REST API in real time.
 ## Screenshots
 
 ### Home Page
-![Home Page](Home.png)
+![Home Page](src/Home.png)
 
 ### Weather Forecast — India (Bijapur)
-![Weather Result](Result.png)
+![Weather Result](src/Result.png)
 
 ### Weather Forecast — Global (London)
-![5-Day Forecast](Result2.png)
+![5-Day Forecast](src/Result2.png)
 
 ---
 
