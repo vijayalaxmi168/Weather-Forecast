@@ -1,20 +1,23 @@
 # Weather Forecast App 🌤️
 
 A web application that gives you real-time weather and a 5-day forecast 
-for any city in the world. Built with Java Spring Boot 3.
+for any city in the world.
 
-This project was originally built in Python Django during my MCA and 
-I later converted it to Spring Boot as part of learning Java backend development.
-
+A full-stack weather forecast application built with Java Spring Boot 3.
+Designed with a clean layered architecture — Controller, Service and DTO pattern
+consuming the OpenWeatherMap REST API in real time.
 ---
 
 ## Screenshots
 
 ### Home Page
-![Home Page](screenshots/home.png)
+![Home Page](home.png)
 
-### Weather Forecast Result
-![Weather Result](screenshots/result.png)
+### Weather Forecast — India (Bijapur)
+![Weather Result](result.png)
+
+### Weather Forecast — Global (London)
+![5-Day Forecast](result2.png)
 
 ---
 
@@ -31,7 +34,7 @@ I later converted it to Spring Boot as part of learning Java backend development
 
 ## Technologies I used
 
-- **Java 17** — main programming language
+- **Java 21** — main programming language
 - **Spring Boot 3** — backend framework
 - **Thymeleaf** — frontend templating engine (like Django templates)
 - **RestTemplate** — to call the OpenWeatherMap API
@@ -123,5 +126,3 @@ Clean architecture is not optional — it is the standard.
 
 📧 Connect with me → [@vijayalaxmi168](https://github.com/vijayalaxmi168)
 
-[![GitHub followers](https://img.shields.io/github/followers/vijayalaxmi168?style=social)](https://github.com/vijayalaxmi168)
-[![GitHub stars](https://img.shields.io/github/stars/vijayalaxmi168/Weather-Forecast?style=social)](https://github.com/vijayalaxmi168/Weather-Forecast)
