@@ -6,7 +6,7 @@ for any city in the world.
 A full-stack weather forecast application built with Java Spring Boot 3.
 Designed with a clean layered architecture — Controller, Service and DTO pattern
 consuming the OpenWeatherMap REST API in real time.
-Deployed on Render — weatherpulse-forecast.onrender.com
+Deployed on Render —https://weatherpulse-forecast.onrender.com/
 ---
 
 ## Screenshots
