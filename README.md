@@ -1,4 +1,4 @@
-# Weather Forecast App 🌤️
+# WeatherPulse Forecast App 🌤️
 
 A web application that gives you real-time weather and a 5-day forecast 
 for any city in the world.
