@@ -20,9 +20,13 @@ import java.util.List;
  * @JsonIgnoreProperties(ignoreUnknown = true)  — silently ignores any JSON
  * fields we don't declare, just like Python dicts let you access only what you need.
  */
+
+
 @Data                                        // Lombok: generates getters, setters, toString, equals, hashCode
 @JsonIgnoreProperties(ignoreUnknown = true)  // ignore extra JSON fields
 public class WeatherApiResponse {
+    // ✅ NEW — true when we're serving cached fallback data, not live API
+    private boolean fallback = false;
 
     @JsonProperty("city")
     private CityInfo city;

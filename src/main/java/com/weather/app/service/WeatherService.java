@@ -17,27 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * ══════════════════════════════════════════════════════════════════
- * WeatherService  —  Java equivalent of your Django utils.py
- * ══════════════════════════════════════════════════════════════════
- *
- * DJANGO → SPRING MAPPING
- * ┌─────────────────────────────┬──────────────────────────────────┐
- * │ Django (utils.py)           │ Spring (WeatherService.java)     │
- * ├─────────────────────────────┼──────────────────────────────────┤
- * │ import requests             │ RestTemplate (injected via ctor) │
- * │ api_key = '...'             │ @Value("${weather.api.key}")     │
- * │ response = requests.get(url)│ restTemplate.getForObject(url,…) │
- * │ data = response.json()      │ Jackson auto-maps → DTO          │
- * │ data['city']['name']        │ apiResponse.getCity().getName()  │
- * │ for forecast in forecasts:  │ .stream().collect(groupingBy(…)) │
- * │ return {'error': '...'}     │ throw new WeatherException("…")  │
- * └─────────────────────────────┴──────────────────────────────────┘
- *
- * @Service  — marks this as a Spring-managed service bean
- * @Slf4j    — Lombok injects a 'log' field (replaces print() debugging)
- */
+
 @Slf4j
 @Service
 public class WeatherService {
@@ -83,35 +63,14 @@ public class WeatherService {
         return buildWeatherResponse(apiResponse);           // ② map → DTO
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // PRIVATE HELPERS
-    // ─────────────────────────────────────────────────────────────────────
 
-    /**
-     * Builds the API URL.
-     *
-     * Django equivalent:
-     *   url = f"{base_url}q={city}&appid={api_key}&units=metric"
-     */
     private String buildUrl(String city) {
         return String.format("%s?q=%s&appid=%s&units=%s", baseUrl, city, apiKey, units);
     }
 
-    /**
-     * Makes the HTTP GET request and handles errors.
-     *
-     * Django equivalent:
-     *   response = requests.get(url)
-     *   if response.status_code == 404: return {'error': 'City not found!'}
-     *   elif response.status_code != 200: return {'error': 'Error fetching...'}
-     *
-     * Key difference: Java throws exceptions instead of returning error dicts.
-     */
+
     private WeatherApiResponse callApi(String url) {
         try {
-            // restTemplate.getForObject() does two things at once:
-            //   1. Makes the HTTP GET request  (like requests.get(url))
-            //   2. Maps JSON response → Java DTO  (like response.json())
             WeatherApiResponse response = restTemplate.getForObject(url, WeatherApiResponse.class);
 
             if (response == null) {
@@ -120,30 +79,37 @@ public class WeatherService {
             return response;
 
         } catch (HttpClientErrorException.NotFound e) {
-            // 404 — same as your: elif response.status_code == 404:
             log.warn("City not found for URL: {}", url);
             throw new WeatherException("City not found! Please check the city name and try again.");
 
         } catch (HttpClientErrorException e) {
-            // Other 4xx errors
             log.error("API client error: {}", e.getMessage());
             throw new WeatherException("Weather service error: " + e.getStatusCode());
 
         } catch (Exception e) {
-            // Network errors, timeouts, etc.
-            log.error("Unexpected error calling weather API", e);
-            throw new WeatherException("Error fetching weather data. Please try again later.");
+            // ✅ NEW: Instead of throwing, load fallback data
+            log.warn("OpenWeatherMap API failed. Switching to fallback data. Reason: {}", e.getMessage());
+            return loadFallbackData();
+        }
+    }
+    // ✅ NEW METHOD — loads fallback JSON from classpath
+    private WeatherApiResponse loadFallbackData() {
+        try {
+            org.springframework.core.io.ClassPathResource resource =
+                    new org.springframework.core.io.ClassPathResource("fallback-weather.json");
+
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            WeatherApiResponse fallback = mapper.readValue(resource.getInputStream(), WeatherApiResponse.class);
+            fallback.setFallback(true); // ✅ flag so the UI can show the banner
+            return fallback;
+
+        } catch (Exception ex) {
+            log.error("Could not load fallback weather data", ex);
+            throw new WeatherException("Weather service is currently unavailable. Please try again later.");
         }
     }
 
-    /**
-     * Maps the raw API response to our clean WeatherResponse DTO.
-     *
-     * Django equivalent: all the dict-building logic in your utils.py —
-     *   city_name = data['city']['name']
-     *   for forecast in forecasts:
-     *       forecast_data.append({ 'time': ..., 'temperature': ..., ... })
-     */
+
     private WeatherResponse buildWeatherResponse(WeatherApiResponse apiResponse) {
 
         List<ForecastItem> forecastList = apiResponse.getForecastList();
@@ -183,6 +149,7 @@ public class WeatherService {
                 .country(apiResponse.getCity().getCountry())
                 .current(current)
                 .forecast(dailyForecasts)
+                .fallback(apiResponse.isFallback())   // ✅ add this line
                 .build();
     }
 

@@ -23,6 +23,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeatherResponse {
+    // ✅ NEW — true when we're serving cached fallback data, not live API
+    private boolean fallback = false;
 
     private String city;     // "London"
     private String country;  // "GB"

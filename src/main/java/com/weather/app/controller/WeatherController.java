@@ -94,6 +94,7 @@ public class WeatherController {
             // → Thymeleaf: ${weather.city}, ${weather.current.temp}, etc.
             model.addAttribute("weather", weather);
             model.addAttribute("searchedCity", city);
+            model.addAttribute("isFallback", weather.isFallback()); // ✅ NEW
 
         } catch (WeatherException e) {
             // model.addAttribute("error", "City not found!")

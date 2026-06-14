@@ -155,6 +155,13 @@
       Thymeleaf: th:if="${weather}" — null-safe; hides block if no data
     -->
     <div th:if="${weather}">
+        <!-- ✅ NEW: Fallback banner — only shows when API is down -->
+        <div th:if="${isFallback}"
+             style="background:#fff3cd; border:1px solid #ffc107; color:#856404;
+            padding:12px 20px; border-radius:8px; margin-bottom:16px;
+            text-align:center; font-weight:500;">
+            ⚠️ Displaying cached/offline backup data — Live weather service is temporarily unavailable.
+        </div>
 
         <!-- ── CURRENT WEATHER CARD ──────────────────────────────── -->
         <!--
