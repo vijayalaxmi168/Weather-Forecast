@@ -1,260 +1,486 @@
 <!DOCTYPE html>
-<!--
-  Thymeleaf namespace declaration.
-  Django equivalent: {% load ... %} at top of template.
-  This one line enables all th:* attributes below.
--->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Forecast</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>WeatherPulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* ── Identical CSS from your Django project ── */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy-900: #070b14;
+            --card-bg: rgba(255,255,255,0.04);
+            --card-border: rgba(255,255,255,0.07);
+            --blue-accent: #3b82f6;
+            --teal-accent: #2dd4bf;
+            --text-primary: #f1f5f9;
+            --text-secondary: #64748b;
+            --text-muted: #334155;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
+            background: var(--navy-900);
+            color: var(--text-primary);
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #fff;
-            padding: 20px;
+            overflow-x: hidden;
         }
 
-        .container { max-width: 900px; margin: 0 auto; }
-
-        header { text-align: center; padding: 40px 0 30px; }
-        header h1 {
-            font-size: 2.4rem; font-weight: 700; letter-spacing: 1px;
-            background: linear-gradient(90deg, #a78bfa, #60a5fa);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        .app {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            gap: 20px;
         }
-        header p { color: rgba(255,255,255,0.5); margin-top: 6px; font-size: 0.95rem; }
 
-        .search-box { display: flex; gap: 12px; margin: 0 auto 40px; max-width: 500px; }
-        .search-box input {
-            flex: 1; padding: 14px 20px; border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.08); color: #fff; font-size: 1rem;
-            outline: none; transition: border 0.3s, background 0.3s; font-family: 'Inter', sans-serif;
+        @media (max-width: 768px) {
+            .app { grid-template-columns: 1fr; padding: 16px; }
+            .sidebar { display: none; }
         }
-        .search-box input::placeholder { color: rgba(255,255,255,0.35); }
-        .search-box input:focus { border-color: #a78bfa; background: rgba(167,139,250,0.12); }
-        .search-box button {
-            padding: 14px 28px; border-radius: 50px; border: none;
-            background: linear-gradient(135deg, #a78bfa, #60a5fa);
-            color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s; font-family: 'Inter', sans-serif;
-        }
-        .search-box button:hover { opacity: 0.88; transform: scale(1.02); }
 
-        .error-msg {
-            background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4);
-            color: #fca5a5; padding: 14px 20px; border-radius: 12px;
-            text-align: center; max-width: 500px; margin: 0 auto 30px;
+        .sidebar {
+            grid-row: 1 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(145deg, #1a2a4a, #0d1a30);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 20px;
+            padding: 24px 20px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #60a5fa, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .search-form {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .search-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .search-input-wrap { position: relative; }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 11px 44px 11px 14px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .search-input::placeholder { color: var(--text-secondary); }
+        .search-input:focus { border-color: rgba(59,130,246,0.5); background: rgba(59,130,246,0.06); }
+
+        .search-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            border: none;
+            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: opacity 0.2s;
+        }
+        .search-btn:hover { opacity: 0.85; }
+
+        .cluster-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .cluster-title {
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 12px;
+        }
+
+        .cluster-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+
+        .cluster-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        .dot-green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+        .dot-yellow { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+        .dot-red { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .cluster-footer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .main-content { display: flex; flex-direction: column; gap: 20px; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .topbar-city { font-size: 1rem; font-weight: 600; margin-top: 2px; }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.72rem;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .cached-badge {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.25);
+            color: #f59e0b;
         }
 
         .current-card {
-            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px; padding: 36px; margin-bottom: 30px;
-            backdrop-filter: blur(10px); display: flex; align-items: center;
-            justify-content: space-between; gap: 20px; flex-wrap: wrap;
+            background: linear-gradient(145deg, #0f1f3d, #0a1628);
+            border: 1px solid rgba(59,130,246,0.15);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
         }
-        .current-left h2 { font-size: 1.8rem; font-weight: 600; }
-        .current-left .country { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 2px; }
-        .current-left .description { color: #a78bfa; margin-top: 8px; font-size: 1rem; }
-        .current-left .feels { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin-top: 4px; }
-        .current-stats { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
-        .stat {
-            background: rgba(255,255,255,0.05); border-radius: 12px;
-            padding: 10px 18px; font-size: 0.88rem; color: rgba(255,255,255,0.7);
-        }
-        .stat span { color: #60a5fa; font-weight: 600; }
-        .current-right { display: flex; align-items: center; gap: 10px; }
-        .current-right img {
-            width: 80px; height: 80px;
-            filter: drop-shadow(0 0 12px rgba(167,139,250,0.5));
-        }
-        .current-right .temp { font-size: 4rem; font-weight: 700; line-height: 1; }
-        .current-right .temp sup { font-size: 1.5rem; vertical-align: top; margin-top: 10px; display: inline-block; }
 
-        .forecast-title {
-            font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.6);
-            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
+        .current-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+            pointer-events: none;
         }
-        .forecast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+
+        .current-temp-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .weather-icon { width: 72px; height: 72px; filter: drop-shadow(0 0 16px rgba(59,130,246,0.4)); }
+
+        .temp-big {
+            font-size: 5.5rem;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -4px;
+            background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .current-desc {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #93c5fd;
+            margin-bottom: 4px;
+            text-transform: capitalize;
+        }
+
+        .current-feels { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 16px; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .stat-item { text-align: center; }
+        .stat-icon { font-size: 1.1rem; margin-bottom: 4px; }
+        .stat-value { font-size: 1rem; font-weight: 700; color: #e2e8f0; }
+        .stat-label { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+        .forecast-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 12px;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .forecast-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
         .forecast-card {
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 20px; padding: 20px 16px; text-align: center;
-            transition: transform 0.2s, background 0.2s;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 16px 12px;
+            text-align: center;
+            transition: transform 0.2s, background 0.2s, border-color 0.2s;
+            cursor: pointer;
         }
-        .forecast-card:hover { transform: translateY(-4px); background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3); }
-        .forecast-card .day { font-weight: 600; font-size: 0.95rem; }
-        .forecast-card .fdate { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-        .forecast-card img { width: 54px; height: 54px; margin: 10px auto; display: block; filter: drop-shadow(0 0 6px rgba(167,139,250,0.4)); }
-        .forecast-card .fdesc { font-size: 0.78rem; color: #a78bfa; margin-bottom: 10px; }
-        .forecast-card .temps { display: flex; justify-content: center; gap: 10px; font-size: 0.9rem; }
-        .forecast-card .tmax { font-weight: 700; }
-        .forecast-card .tmin { color: rgba(255,255,255,0.4); }
-        .forecast-card .fstats { margin-top: 10px; font-size: 0.72rem; color: rgba(255,255,255,0.4); }
 
-        .placeholder { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.25); }
-        .placeholder .big-icon { font-size: 5rem; margin-bottom: 16px; }
+        .forecast-card:hover {
+            transform: translateY(-4px);
+            background: rgba(59,130,246,0.08);
+            border-color: rgba(59,130,246,0.25);
+        }
 
-        footer { text-align: center; padding: 40px 0 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; }
+        .forecast-day { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; }
+        .forecast-date { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-muted); margin-top: 3px; }
+        .forecast-icon { width: 44px; height: 44px; margin: 10px auto; display: block; filter: drop-shadow(0 0 8px rgba(59,130,246,0.3)); }
+        .forecast-desc { font-size: 0.68rem; color: #7dd3fc; margin-bottom: 8px; text-transform: capitalize; min-height: 28px; }
+        .forecast-temps { display: flex; justify-content: center; gap: 8px; font-size: 0.88rem; font-weight: 700; }
+        .temp-max { color: #f1f5f9; }
+        .temp-min { color: var(--text-secondary); font-weight: 400; }
+        .forecast-stats { margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-muted); }
+
+        .placeholder {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 60px 32px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .placeholder-icon { font-size: 4rem; margin-bottom: 16px; }
+        .placeholder-text { font-size: 0.9rem; }
+        .placeholder-sub { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-muted); margin-top: 8px; }
+
+        .error-banner { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 14px; padding: 14px 20px; font-size: 0.85rem; color: #fca5a5; }
+        .fallback-banner { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 14px 20px; font-size: 0.82rem; color: #fcd34d; }
+
+        .mobile-search { display: none; }
+        @media (max-width: 768px) { .mobile-search { display: block; } }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <header>
-        <h1>⛅ Weather Forecast</h1>
-        <p>Get 5-day weather forecast for any city in the world</p>
-    </header>
+<div class="app">
 
-    <!--
-      SEARCH FORM
-      ═══════════════════════════════════════════════════════════════
-      Django:   <form method="POST" action="">{% csrf_token %}
-      Thymeleaf: th:action="@{/weather}" — @{} generates the URL
-                 th:value="${searchedCity}" — pre-fills with last search
-
-      Note: No CSRF token tag needed — Spring Security / Thymeleaf
-            handles it automatically via th:action.
-    -->
-    <form method="post" th:action="@{/weather}">
-        <div class="search-box">
-            <input
-                type="text"
-                name="city"
-                placeholder="Enter city name... e.g. London, Mumbai"
-                th:value="${searchedCity}"
-                autocomplete="off"
-                required
-            />
-            <button type="submit">Search</button>
-        </div>
-    </form>
-
-    <!--
-      ERROR MESSAGE
-      ═══════════════════════════════════════════════════════════════
-      Django:    {% if error %} {{ error }} {% endif %}
-      Thymeleaf: th:if="${error}" — evaluates to false when null (safe)
-                 th:text="${error}" — outputs the text content
-    -->
-    <div class="error-msg" th:if="${error}">
-        ⚠️ <span th:text="${error}">Error message here</span>
-    </div>
-
-    <!--
-      WEATHER RESULTS BLOCK
-      ═══════════════════════════════════════════════════════════════
-      Django:    {% if weather %}
-      Thymeleaf: th:if="${weather}" — null-safe; hides block if no data
-    -->
-    <div th:if="${weather}">
-        <!-- ✅ NEW: Fallback banner — only shows when API is down -->
-        <div th:if="${isFallback}"
-             style="background:#fff3cd; border:1px solid #ffc107; color:#856404;
-            padding:12px 20px; border-radius:8px; margin-bottom:16px;
-            text-align:center; font-weight:500;">
-            ⚠️ Displaying cached/offline backup data — Live weather service is temporarily unavailable.
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>WeatherPulse</h1>
+            <p>Spring Cloud Gateway</p>
         </div>
 
-        <!-- ── CURRENT WEATHER CARD ──────────────────────────────── -->
-        <!--
-          Django:    {{ weather.city }}, {{ weather.current.description }}
-          Thymeleaf: th:text="${weather.city}" — uses getter weather.getCity()
-                     ${weather.current.temp} — calls weather.getCurrent().getTemp()
-        -->
-        <div class="current-card">
-            <div class="current-left">
-                <h2 th:text="${weather.city}">City Name</h2>
-                <div class="country" th:text="${weather.country}">Country</div>
-                <div class="description" th:text="${weather.current.description}">Description</div>
-                <div class="feels">
-                    Feels like
-                    <!-- th:text replaces the tag's text content at runtime -->
-                    <span th:text="${weather.current.feelsLike}">0</span>°C
+        <div class="search-form">
+            <span class="search-label">Search City</span>
+            <form method="post" th:action="@{/weather}">
+                <div class="search-input-wrap">
+                    <input type="text" name="city" th:value="${searchedCity}"
+                           placeholder="City, country..." autocomplete="off"
+                           required class="search-input"/>
+                    <button type="submit" class="search-btn">🔍</button>
                 </div>
-                <div class="current-stats">
-                    <div class="stat">
-                        💧 Humidity: <span th:text="${weather.current.humidity} + '%'">0%</span>
+            </form>
+        </div>
+
+        <div class="cluster-card">
+            <div class="cluster-title">Cluster Health</div>
+            <div class="cluster-row">
+                <span class="cluster-name">api-gateway:8080</span>
+                <span class="dot dot-green"></span>
+            </div>
+            <div class="cluster-row">
+                <span class="cluster-name">weather-svc:8081</span>
+                <span th:class="${weather != null and !isFallback} ? 'dot dot-green' : 'dot dot-yellow'"></span>
+            </div>
+            <div class="cluster-row">
+                <span class="cluster-name">openweather-api</span>
+                <span th:class="${isFallback} ? 'dot dot-red' : 'dot dot-green'"></span>
+            </div>
+            <div class="cluster-footer">/** → :8081 · Gateway active</div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+
+        <div class="mobile-search">
+            <form method="post" th:action="@{/weather}">
+                <div class="search-input-wrap">
+                    <input type="text" name="city" th:value="${searchedCity}"
+                           placeholder="Search city..." autocomplete="off"
+                           required class="search-input" style="width:100%"/>
+                    <button type="submit" class="search-btn">🔍</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="topbar">
+            <div>
+                <div class="topbar-label">Current Forecast</div>
+                <div class="topbar-city" th:if="${weather}" th:text="${weather.city} + ', ' + ${weather.country}">—</div>
+                <div class="topbar-city" th:if="${weather == null}">No city selected</div>
+            </div>
+            <div th:if="${weather}">
+                <span th:if="${!isFallback}" class="live-badge">
+                    <span class="dot dot-green" style="width:6px;height:6px"></span>
+                    Live Data
+                </span>
+                <span th:if="${isFallback}" class="live-badge cached-badge">⚠️ Cached Data</span>
+            </div>
+        </div>
+
+        <div class="fallback-banner" th:if="${isFallback}">
+            ⚠️ Live weather service unavailable — showing cached backup data.
+        </div>
+
+        <div class="error-banner" th:if="${error}">
+            ⚠️ <span th:text="${error}">Error</span>
+        </div>
+
+        <div th:if="${weather}">
+            <div class="current-card">
+                <div class="current-desc" th:text="${weather.current.description}">Description</div>
+                <div class="current-feels">Feels like <span th:text="${weather.current.feelsLike}">0</span>°C</div>
+
+                <div class="current-temp-row">
+                    <img class="weather-icon"
+                         th:src="@{'https://openweathermap.org/img/wn/' + ${weather.current.icon} + '@2x.png'}"
+                         th:alt="${weather.current.description}" alt="icon"/>
+                    <div class="temp-big" th:text="${weather.current.temp} + '°'">0°</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-value" th:text="${weather.current.humidity} + '%'">0%</div>
+                        <div class="stat-label">Humidity</div>
                     </div>
-                    <div class="stat">
-                        💨 Wind: <span th:text="${weather.current.windSpeed} + ' m/s'">0 m/s</span>
+                    <div class="stat-item">
+                        <div class="stat-icon">💨</div>
+                        <div class="stat-value" th:text="${weather.current.windSpeed} + ' m/s'">0</div>
+                        <div class="stat-label">Wind</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🌡️</div>
+                        <div class="stat-value" th:text="${weather.current.feelsLike} + '°'">0°</div>
+                        <div class="stat-label">Feels Like</div>
                     </div>
                 </div>
             </div>
-            <div class="current-right">
-                <!--
-                  DYNAMIC img src
-                  Django:    src="https://openweathermap.org/img/wn/{{ weather.current.icon }}@2x.png"
-                  Thymeleaf: th:src="@{'https://.../' + ${weather.current.icon} + '@2x.png'}"
-                             @{} builds URLs; string concat uses + inside the expression
-                -->
-                <img th:src="@{'https://openweathermap.org/img/wn/' + ${weather.current.icon} + '@2x.png'}"
-                     th:alt="${weather.current.description}"
-                     alt="weather icon"/>
-                <div class="temp">
-                    <span th:text="${weather.current.temp}">0</span><sup>°C</sup>
+
+            <div style="margin-top: 24px;">
+                <div class="forecast-label">📅 5-Day Outlook</div>
+                <div class="forecast-grid">
+                    <div class="forecast-card" th:each="day : ${weather.forecast}">
+                        <div class="forecast-day" th:text="${day.dayName}">Mon</div>
+                        <div class="forecast-date" th:text="${day.formattedDate}">01 Jan</div>
+                        <img class="forecast-icon"
+                             th:src="@{'https://openweathermap.org/img/wn/' + ${day.icon} + '@2x.png'}"
+                             th:alt="${day.description}" alt="icon"/>
+                        <div class="forecast-desc" th:text="${day.description}">Cloudy</div>
+                        <div class="forecast-temps">
+                            <span class="temp-max" th:text="${day.tempMax} + '°'">0°</span>
+                            <span class="temp-min" th:text="${day.tempMin} + '°'">0°</span>
+                        </div>
+                        <div class="forecast-stats">
+                            <span th:text="|💧${day.humidity}%|">💧0%</span>
+                            &nbsp;
+                            <span th:text="|💨${day.windSpeed}|">💨0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ── 5-DAY FORECAST ────────────────────────────────────── -->
-        <div class="forecast-title">📅 5-Day Forecast</div>
-        <div class="forecast-grid">
-            <!--
-              LOOP OVER LIST
-              Django:    {% for day in weather.forecast %}
-              Thymeleaf: th:each="day : ${weather.forecast}"
-                         Works exactly like Python's for-in loop.
-                         Each iteration variable 'day' exposes DailyForecast fields.
-            -->
-            <div class="forecast-card" th:each="day : ${weather.forecast}">
-                <div class="day"    th:text="${day.dayName}">Monday</div>
-                <div class="fdate"  th:text="${day.formattedDate}">01 Jan 2024</div>
-
-                <img th:src="@{'https://openweathermap.org/img/wn/' + ${day.icon} + '@2x.png'}"
-                     th:alt="${day.description}"
-                     alt="weather icon"/>
-
-                <div class="fdesc"  th:text="${day.description}">Partly Cloudy</div>
-
-                <div class="temps">
-                    <span class="tmax" th:text="${day.tempMax} + '°'">0°</span>
-                    <span class="tmin" th:text="${day.tempMin} + '°'">0°</span>
-                </div>
-
-                <div class="fstats">
-                    <!--
-                      String interpolation
-                      Django:    {{ day.humidity }}% &nbsp; {{ day.wind_speed }}m/s
-                      Thymeleaf: th:text uses literal substitution |...|
-                                 Pipe syntax | | works like Python f-strings
-                    -->
-                    <span th:text="|💧 ${day.humidity}%|">💧 0%</span>
-                    &nbsp;
-                    <span th:text="|💨 ${day.windSpeed}m/s|">💨 0m/s</span>
-                </div>
-            </div>
+        <div class="placeholder" th:if="${weather == null and error == null}">
+            <div class="placeholder-icon">🌐</div>
+            <div class="placeholder-text">Search any city to see live forecast</div>
+            <div class="placeholder-sub">routed via api-gateway:8080 → weather-svc:8081</div>
         </div>
-    </div>
 
-    <!--
-      PLACEHOLDER (shown when no search yet and no error)
-      Django:    {% if not error %} ... {% endif %}
-      Thymeleaf: th:if="${weather == null and error == null}"
-    -->
-    <div class="placeholder" th:if="${weather == null and error == null}">
-        <div class="big-icon">🌍</div>
-        <p>Enter a city name above to see the weather forecast</p>
     </div>
-
-    <footer>Powered by OpenWeatherMap API</footer>
 </div>
+
 </body>
 </html>
