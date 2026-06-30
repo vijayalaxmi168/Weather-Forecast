@@ -12,13 +12,13 @@ Deployed on Render —https://weatherpulse-forecast.onrender.com/
 ## Screenshots
 
 ### Home Page
-![Home Page](src/Home.png)
+![Home Page](Screenshots/Home.png)
 
 ### Weather Forecast — India (Bijapur)
-![Weather Result](src/Result.png)
+![Weather Result](Screenshots/Result.png)
 
-### Weather Forecast — Global (London)
-![5-Day Forecast](src/Result2.png)
+### Weather Forecast — Global (Paris)
+![5-Day Forecast](Screenshots/Result2.png)
 
 ---
 
