@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -54,6 +55,7 @@ public class WeatherService {
      *
      * Django equivalent: the entire get_weather(city) function in utils.py
      */
+    @Cacheable(value = "weatherCache", key = "#city.toLowerCase()")
     public WeatherResponse getWeather(String city) {
 
         String url = buildUrl(city);

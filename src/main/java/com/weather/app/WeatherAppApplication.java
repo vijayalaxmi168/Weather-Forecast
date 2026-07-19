@@ -2,6 +2,7 @@ package com.weather.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * Spring Boot entry point.
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *   java -jar target/weather-app-1.0.0.jar
  */
 @SpringBootApplication
+@EnableCaching
 public class WeatherAppApplication {
 
     public static void main(String[] args) {

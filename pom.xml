@@ -47,6 +47,12 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+        <!-- Cache abstraction — enables @Cacheable / @EnableCaching -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!-- Lombok — eliminates boilerplate getters/setters/constructors -->
         <dependency>
             <groupId>org.projectlombok</groupId>
