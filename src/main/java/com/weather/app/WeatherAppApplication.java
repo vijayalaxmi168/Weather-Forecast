@@ -4,16 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
-/**
- * Spring Boot entry point.
- *
- * Django equivalent: manage.py runserver
- *
- * Run this app with:
- *   mvn spring-boot:run
- *   — OR —
- *   java -jar target/weather-app-1.0.0.jar
- */
+
 @SpringBootApplication
 @EnableCaching
 public class WeatherAppApplication {
