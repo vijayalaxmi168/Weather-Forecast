@@ -5,20 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Clean, UI-ready DTO for a single day's forecast.
- *
- * Django equivalent — the dict you built in utils.py:
- *   forecast_data.append({
- *       'day_name': ..., 'formatted_date': ...,
- *       'temp_max': ..., 'temp_min': ..., ...
- *   })
- *
- * Lombok annotations used:
- *   @Data           → getters + setters + toString + equals/hashCode
- *   @Builder        → DailyForecast.builder().dayName("Monday").build()
- *   @NoArgsConstructor / @AllArgsConstructor → both constructors
- */
+
 @Data
 @Builder
 @NoArgsConstructor
