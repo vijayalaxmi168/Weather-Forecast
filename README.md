@@ -113,22 +113,8 @@ cd Weather-Forecast
 # Add your OpenWeatherMap API key in src/main/resources/application.properties
 # weather.api.key=YOUR_API_KEY_HERE
 
-# Run the application
-mvn spring-boot:run
-```
 
 The weather app runs on 👉 **http://localhost:8081**
-
-### 2. Run the Gateway (optional, for routing through a single entry point)
-
-```bash
-cd weatherpulse-gateway
-mvn spring-boot:run
-```
-
-The Gateway runs on 👉 **http://localhost:8080** and forwards all requests to the weather app on 8081.
-
-> Note: Run the weather app first, then the Gateway — the Gateway routes traffic to it.
 
 ---
 
