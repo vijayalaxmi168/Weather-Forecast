@@ -6,20 +6,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * Maps the TOP-LEVEL OpenWeatherMap /forecast JSON response.
- *
- * Django equivalent: data = response.json()
- *
- * Sample JSON shape:
- * {
- *   "city": { "name": "London", "country": "GB" },
- *   "list": [ { "dt_txt": "...", "main": {...}, "weather": [...], "wind": {...} }, ... ]
- * }
- *
- * @JsonIgnoreProperties(ignoreUnknown = true)  — silently ignores any JSON
- * fields we don't declare, just like Python dicts let you access only what you need.
- */
 
 
 @Data                                        // Lombok: generates getters, setters, toString, equals, hashCode
