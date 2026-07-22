@@ -8,13 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Basic smoke tests for WeatherService.
- *
- * Django equivalent: tests.py using TestCase
- *
- * Run with: mvn test
- */
+
 @SpringBootTest
 class WeatherServiceTest {
 
@@ -23,7 +17,7 @@ class WeatherServiceTest {
 
     @Test
     void contextLoads() {
-        // Verifies the Spring context starts without errors
+      
         assertNotNull(weatherService);
     }
 
